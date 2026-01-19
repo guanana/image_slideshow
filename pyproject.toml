@@ -27,4 +27,4 @@ dependencies = [
 slideshow-app = "main:main"
 
 [tool.setuptools]
-py-modules = ["main", "slideshow"]
+py-modules = ["api", "main", "slideshow", "database"]
