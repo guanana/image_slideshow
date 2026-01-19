@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simple-image-slideshow"
+version = "1.1.0"
+authors = [
+  { name="DeepMind Antigravity", email="antigravity@google.com" },
+]
+description = "A simple, robust image slideshow application for Raspberry Pi"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = [
+    "fastapi>=0.128.0",
+    "Pillow>=10.0.0",
+    "pydantic>=2.12.5",
+    "uvicorn>=0.40.0",
+]
+
+[project.scripts]
+slideshow-app = "main:main"
+
+[tool.setuptools]
+py-modules = ["main", "slideshow"]
