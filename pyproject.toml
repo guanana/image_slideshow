@@ -21,6 +21,9 @@ dependencies = [
     "Pillow>=10.0.0",
     "pydantic>=2.12.5",
     "uvicorn>=0.40.0",
+    "numpy>=2.2.1",
+    "pillow>=11.0.0",
+    "inky>=2.2.1"
 ]
 
 [project.scripts]

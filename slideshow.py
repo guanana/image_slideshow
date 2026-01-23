@@ -1,7 +1,9 @@
 import os
 import random
 import tkinter as tk
+
 from PIL import Image, ImageTk, ImageOps
+from inky.auto import auto
 
 class SlideshowApp:
     def __init__(self, root, image_folder, interval=5, fullscreen=True, db=None):
@@ -47,6 +49,7 @@ class SlideshowApp:
 
         # Start slideshow after window stabilizes
         self.root.after(200, self.start_slideshow)
+        self.ink_screen = True
 
     def schedule_reload(self):
         # Poll every 5 seconds
@@ -201,3 +204,13 @@ class SlideshowApp:
             self.current_photo_path = self.images[self.current_image_index]
         except Exception as e:
             print(f"Error displaying image: {e}")
+        if self.ink_screen:
+            image = Image.open(self.images[self.current_image_index])
+            inky = auto(ask_user=True, verbose=True)
+            resizedimage = image.resize(inky.resolution)
+
+            try:
+                inky.set_image(resizedimage, saturation=0.5)
+            except TypeError:
+                inky.set_image(resizedimage)
+            inky.show()
