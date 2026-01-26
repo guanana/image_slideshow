@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slideshow Control Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent-color: #38bdf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.1) 0, transparent 50%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.875rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .card.modified {
+            border-color: var(--warning);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--accent-color), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            padding: 0.6rem 0.8rem;
+            width: 100%;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .save-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(10px);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .modified .save-btn {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(0);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        button.btn-main {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button.btn-main:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+
+        button.sync {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            color: white;
+            border: none;
+        }
+
+        button.restart {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        button.restart:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--accent-color);
+            transform: translateY(200%);
+            transition: transform 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 34px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--success);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Slideshow Hub</h1>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                System Online
+            </div>
+        </header>
+
+        <div id="config-grid" class="grid">
+            <div class="card">
+                <div class="card-label">Loading...</div>
+                <div class="card-value loading">Fetching settings...</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-main" onclick="fetchConfig()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                </svg>
+                Refresh
+            </button>
+            <button class="btn-main sync" onclick="syncConfig()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 2v6h-6M3 22v-6h6M21 13a9 9 0 11-3-7.7L21 8M3 11a9 9 0 013-7.7L3 6" />
+                </svg>
+                Sync with config.ini
+            </button>
+            <button class="btn-main restart" onclick="restartApp()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10" />
+                </svg>
+                Restart App
+            </button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Action completed!</div>
+
+    <script>
+        let originalConfig = {};
+
+        async function restartApp() {
+            if (!confirm('Are you sure you want to restart the application?')) return;
+            try {
+                const res = await fetch('/restart', { method: 'POST' });
+                const data = await res.json();
+                showToast(data.message);
+                // Disable screen to show it's restarting
+                document.body.style.opacity = '0.5';
+                document.body.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
+            } catch (e) {
+                showToast('Restart command failed', true);
+            }
+        }
+
+        async function fetchConfig() {
+            const grid = document.getElementById('config-grid');
+            try {
+                const res = await fetch('/config');
+                const data = await res.json();
+                originalConfig = { ...data };
+
+                grid.innerHTML = '';
+                Object.entries(data).sort().forEach(([key, value]) => {
+                    grid.appendChild(createConfigCard(key, value));
+                });
+            } catch (e) {
+                showToast('Failed to fetch config', true);
+            }
+        }
+
+        function createConfigCard(key, value) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = `card-${key}`;
+
+            const isBool = value === 'True' || value === 'False';
+            const isNumber = !isNaN(value) && !isNaN(parseFloat(value)) && key !== 'image_extensions';
+
+            const inputHtml = isBool
+                ? `<label class="toggle-switch">
+                     <input type="checkbox" ${value === 'True' ? 'checked' : ''} onchange="handleInputChange('${key}', this.checked ? 'True' : 'False')">
+                     <span class="slider"></span>
+                   </label>`
+                : `<input type="${isNumber ? 'number' : 'text'}" value="${value}" oninput="handleInputChange('${key}', this.value)">`;
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-label">${key.replace(/_/g, ' ')}</div>
+                    <button class="save-btn" onclick="saveValue('${key}')">Save</button>
+                </div>
+                <div class="card-input-wrapper">
+                    ${inputHtml}
+                </div>
+            `;
+            return card;
+        }
+
+        let pendingChanges = {};
+
+        function handleInputChange(key, newValue) {
+            const card = document.getElementById(`card-${key}`);
+            if (String(newValue) !== String(originalConfig[key])) {
+                card.classList.add('modified');
+                pendingChanges[key] = newValue;
+            } else {
+                card.classList.remove('modified');
+                delete pendingChanges[key];
+            }
+        }
+
+        async function saveValue(key) {
+            const newValue = pendingChanges[key];
+            if (newValue === undefined) return;
+
+            try {
+                const res = await fetch('/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [key]: newValue })
+                });
+
+                if (res.ok) {
+                    showToast(`Updated ${key.replace(/_/g, ' ')}`);
+                    originalConfig[key] = newValue;
+                    delete pendingChanges[key];
+                    document.getElementById(`card-${key}`).classList.remove('modified');
+                } else {
+                    const errorData = await res.json();
+                    showToast(errorData.detail || 'Save failed', true);
+                }
+            } catch (e) {
+                showToast('API Error', true);
+            }
+        }
+
+        async function syncConfig() {
+            try {
+                const res = await fetch('/config/sync', { method: 'POST' });
+                const data = await res.json();
+                showToast(data.message);
+                fetchConfig();
+            } catch (e) {
+                showToast('Sync failed', true);
+            }
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.borderColor = isError ? '#ef4444' : '#38bdf8';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchConfig);
+    </script>
+</body>
+
+</html>

@@ -1,7 +1,9 @@
 import os
 import random
 import tkinter as tk
+import threading
 from PIL import Image, ImageTk, ImageOps
+from inky.auto import auto
 
 class SlideshowApp:
     def __init__(self, root, image_folder, interval=5, fullscreen=True, db=None):
@@ -27,18 +29,13 @@ class SlideshowApp:
         # UI Setup & Basic Bindings
         self.root.attributes("-fullscreen", fullscreen)
         self.update_cursor() # Initial cursor state
-        self.root.bind("<Escape>", self.exit_fullscreen)
-        self.root.bind("f", self.toggle_fullscreen)
-        self.root.bind("q", lambda e: self.root.quit())
-        self.root.bind("<Configure>", self.on_resize)
-
-        # Manual Navigation Bindings
-        if self.manual_enabled:
-            self.root.bind("<Right>", self.manual_next)
-            self.root.bind("<Left>", self.manual_prev)
 
         self.label = tk.Label(root, bg=self.bg_color)
         self.label.pack(fill=tk.BOTH, expand=True)
+
+        # Apply bindings and focus
+        self.update_bindings()
+        self.root.focus_set()
 
         self.load_images()
         if not self.images:
@@ -64,6 +61,7 @@ class SlideshowApp:
             self.bg_color = 'black'
             self.manual_enabled = True
             self.ext_str = '.jpg,.jpeg,.png,.gif,.bmp,.webp'
+            self.ink_screen = False
             # Ensure background is applied if root exists
             if hasattr(self, 'root'):
                  self.root.configure(bg=self.bg_color)
@@ -82,26 +80,39 @@ class SlideshowApp:
                 
             self.manual_enabled = self.db.get_setting('enable_manual_controls', 'True').lower() == 'true'
             self.ext_str = self.db.get_setting('image_extensions', '.jpg,.jpeg,.png,.gif,.bmp,.webp')
+            self.ink_screen = self.db.get_setting('enable_inky', 'False').lower() == 'true'
+            
+            # Update bindings in case manual_enabled changed
+            self.update_bindings()
             
             # Apply immediate visual changes
             self.root.configure(bg=self.bg_color)
             if hasattr(self, 'label'):
                 self.label.config(bg=self.bg_color)
                 
-            # Check if folders changed (optional advanced feature, for now just image folder passed in args)
-            # If we wanted to support dynamic folder changing, we'd check 'default_folder' here too
-            # and call load_images() if it changed. Let's do it for completeness if folder matches default.
-            
             # For now, just re-scan images to pick up new files without restart
             self.load_images()
             
         except Exception as e:
             print(f"⚠️ Error reloading config: {e}")
 
+    def update_bindings(self):
+        """Update keyboard bindings based on current configuration."""
+        # Standard bindings
+        self.root.bind("<Escape>", self.exit_fullscreen)
+        self.root.bind("f", self.toggle_fullscreen)
+        self.root.bind("q", lambda e: self.root.quit())
+        self.root.bind("<Configure>", self.on_resize)
+
+        # Toggleable manual navigation
+        if self.manual_enabled:
+            self.root.bind("<Right>", self.manual_next)
+            self.root.bind("<Left>", self.manual_prev)
+        else:
+            self.root.unbind("<Right>")
+            self.root.unbind("<Left>")
+
     def load_images(self):
-        # Allow checking if image list changed to avoid flickering/resetting index
-        current_images_set = set(self.images)
-        
         ext_str = getattr(self, 'ext_str', '.jpg,.jpeg,.png,.gif,.bmp,.webp')
         valid_exts = {e.strip().lower() for e in ext_str.split(',')}
         try:
@@ -139,11 +150,13 @@ class SlideshowApp:
     def toggle_fullscreen(self, event=None):
         self.root.attributes("-fullscreen", not self.root.attributes("-fullscreen"))
         self.update_cursor()
+        self.root.focus_set()
         self.root.after(100, self.update_display)
 
     def exit_fullscreen(self, event=None):
         self.root.attributes("-fullscreen", False)
         self.update_cursor()
+        self.root.focus_set()
         self.root.after(100, self.update_display)
 
     def start_slideshow(self):
@@ -156,6 +169,7 @@ class SlideshowApp:
         self._timer_id = self.root.after(self.interval, self.auto_next)
 
     def auto_next(self):
+        if not self.images: return
         self.current_image_index += 1
         if self.current_image_index >= len(self.images):
             self.current_image_index = 0
@@ -180,7 +194,8 @@ class SlideshowApp:
         if not self.images: return
         
         try:
-            img = Image.open(self.images[self.current_image_index])
+            image_path = self.images[self.current_image_index]
+            img = Image.open(image_path)
             img = ImageOps.exif_transpose(img)
             
             self.root.update_idletasks()
@@ -195,9 +210,30 @@ class SlideshowApp:
             ratio = min(win_w/img_w, win_h/img_h)
             new_size = (int(img_w * ratio), int(img_h * ratio))
             
-            img = img.resize(new_size, Image.Resampling.LANCZOS)
-            self.photo_image = ImageTk.PhotoImage(img)
+            img_gui = img.resize(new_size, Image.Resampling.LANCZOS)
+            self.photo_image = ImageTk.PhotoImage(img_gui)
             self.label.config(image=self.photo_image)
-            self.current_photo_path = self.images[self.current_image_index]
+            self.current_photo_path = image_path
+            
+            # Force UI update so image shows up immediately (before Inky blocks)
+            self.root.update()
+
+            # UPDATE INKY SYNCHRONOUSLY (Blocks the app until done)
+            if self.ink_screen:
+                try:
+                    inky = auto(ask_user=False, verbose=False)
+                    # Use ImageOps.pad to fit image into inky.resolution without distortion
+                    # Centered on a white background
+                    resizedimage = ImageOps.pad(img, inky.resolution, color=(255, 255, 255))
+
+                    try:
+                        inky.set_image(resizedimage, saturation=0.5)
+                    except TypeError:
+                        inky.set_image(resizedimage)
+                    inky.show()
+                except Exception as e:
+                    print(f"⚠️ Inky update failed: {e}. Disabling Inky support for this cycle.")
+                    self.ink_screen = False
+
         except Exception as e:
             print(f"Error displaying image: {e}")
