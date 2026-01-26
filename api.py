@@ -56,3 +56,16 @@ def sync_config():
             return {"status": "warning", "message": "config.ini not found or invalid"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/restart")
+def restart_app():
+    import signal
+    import threading
+    import time
+
+    def kill_soon():
+        time.sleep(1) # Give time for response to send
+        os.kill(os.getpid(), signal.SIGTERM)
+
+    threading.Thread(target=kill_soon).start()
+    return {"status": "ok", "message": "Restarting application..."}

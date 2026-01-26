@@ -221,6 +221,18 @@
             border: none;
         }
 
+        button.restart {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        button.restart:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -336,6 +348,12 @@
                 </svg>
                 Sync with config.ini
             </button>
+            <button class="btn-main restart" onclick="restartApp()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10" />
+                </svg>
+                Restart App
+            </button>
         </div>
     </div>
 
@@ -343,6 +361,23 @@
 
     <script>
         let originalConfig = {};
+
+        async function restartApp() {
+            if (!confirm('Are you sure you want to restart the application?')) return;
+            try {
+                const res = await fetch('/restart', { method: 'POST' });
+                const data = await res.json();
+                showToast(data.message);
+                // Disable screen to show it's restarting
+                document.body.style.opacity = '0.5';
+                document.body.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
+            } catch (e) {
+                showToast('Restart command failed', true);
+            }
+        }
 
         async function fetchConfig() {
             const grid = document.getElementById('config-grid');

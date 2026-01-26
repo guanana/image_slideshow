@@ -214,6 +214,9 @@ class SlideshowApp:
             self.photo_image = ImageTk.PhotoImage(img_gui)
             self.label.config(image=self.photo_image)
             self.current_photo_path = image_path
+            
+            # Force UI update so image shows up immediately (before Inky blocks)
+            self.root.update()
 
             # UPDATE INKY SYNCHRONOUSLY (Blocks the app until done)
             if self.ink_screen:
