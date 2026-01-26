@@ -61,7 +61,8 @@ class Database:
             'enable_manual_controls': 'True',
             'start_fullscreen': 'True',
             'image_extensions': '.jpg,.jpeg,.png,.gif,.bmp,.webp',
-            'enable_inky': 'False'
+            'enable_inky': 'False',
+            'orientation': 'landscape'
         }
         for k, v in defaults.items():
             if self.get_setting(k) is None:

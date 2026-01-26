@@ -123,7 +123,14 @@ if ! command -v uv &> /dev/null; then
     fi
 fi
 
-# 3. Resolve uv path
+# 3. Create System Directory and Set Permissions
+echo "⚙️ Setting up system directory in $CONFIG_DIR (sudo required)..."
+sudo mkdir -p "$CONFIG_DIR"
+sudo mkdir -p "$CONFIG_DIR/images"
+sudo chmod 777 "$CONFIG_DIR"
+sudo chmod 777 "$CONFIG_DIR/images"
+
+# 4. Resolve uv path
 UV_BIN=$(which uv)
 if [ -z "$UV_BIN" ]; then
     echo "❌ Error: uv could not be found even after installation attempt."
@@ -131,50 +138,37 @@ if [ -z "$UV_BIN" ]; then
 fi
 echo "✅ Using uv at: $UV_BIN"
 
-# Sync dependencies to ensure fastapi/uvicorn are installed
-echo "📦 Syncing Python environment..."
+# 5. Sync dependencies to dedicated venv
+echo "📦 Syncing Python environment in $CONFIG_DIR/venv..."
+export UV_PROJECT_ENVIRONMENT="$CONFIG_DIR/venv"
 $UV_BIN sync
 
-# Note: We are using 'uv run' so no need for 'uv tool install'
-echo "ℹ️  Application will run directly from source using 'uv run'."
+# Note: We are using the dedicated venv for both tests and the service
+VENV_PYTHON="$CONFIG_DIR/venv/bin/python"
+echo "ℹ️  Application will use: $VENV_PYTHON"
+
+# 6. Initialize Database
+echo "🗄️ Initializing system database..."
+sudo "$VENV_PYTHON" -c "import sys; sys.path.append('$PROJECT_DIR'); from database import Database; Database()"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# 4. Verification Test
+# 6. Verification Test
 if [ "$SKIP_TEST" = false ]; then
     echo "🧪 Running verification test (GUI smoke test)..."
     echo "   (A window will open briefly to confirm everything is working)"
-    if ! python3 tests/smoke_test.py; then
+    if ! "$VENV_PYTHON" tests/smoke_test.py; then
         echo "⚠️ Warning: Verification test encountered an issue."
         echo "   Make sure you are in a graphical environment (X11/Wayland)."
     fi
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 fi
 
-# 5. Startup Setup
+# 7. Startup Setup
 if [ "$ENABLE_BOOT" = true ]; then
     echo "⚙️ Setting up automatic startup service (-b flag detected)..."
     
     mkdir -p "$SERVICE_DIR"
     
-    # System Config Setup
-    echo "⚙️ Setting up global configuration in /etc/slideshow (sudo required)..."
-    if [ ! -d "$CONFIG_DIR" ]; then
-        sudo mkdir -p "$CONFIG_DIR"
-    fi
-
-    # Create default image directory
-    IMAGES_DIR="/etc/slideshow/images"
-    if [ ! -d "$IMAGES_DIR" ]; then
-        echo "📂 Creating default image directory: $IMAGES_DIR"
-        sudo mkdir -p "$IMAGES_DIR"
-        # Make it writable by everyone for now so user can add images, or at least readable
-        sudo chmod 777 "$IMAGES_DIR"
-    fi
-
-    # Ensure config directory is writable by user for DB creation
-    echo "🔐 Adjusting permissions for database creation..."
-    sudo chmod 777 "$CONFIG_DIR"
-
     # Copy config if not present
     if [ ! -f "$CONFIG_DIR/config.ini" ]; then
         echo "📂 Copying default configuration..."
@@ -187,9 +181,15 @@ if [ "$ENABLE_BOOT" = true ]; then
         fi
     fi
 
+    # Explicitly ensure start_fullscreen is True in the system config for boot setup
+    if [ -f "$CONFIG_DIR/config.ini" ]; then
+        echo "📺 Ensuring fullscreen is enabled by default in system config..."
+        sudo sed -i 's/start_fullscreen = .*/start_fullscreen = True/' "$CONFIG_DIR/config.ini"
+    fi
+
     # Create service file from template
     if [ -f "$PROJECT_DIR/slideshow.service.template" ]; then
-        sed "s|{{WORKDIR}}|$PROJECT_DIR|g; s|{{UV_BIN}}|$UV_BIN|g" \
+        sed "s|{{WORKDIR}}|$PROJECT_DIR|g; s|{{PYTHON_BIN}}|$VENV_PYTHON|g" \
             "$PROJECT_DIR/slideshow.service.template" > "$SERVICE_PATH"
         echo "✅ Service file created from template at $SERVICE_PATH"
     else
@@ -210,8 +210,8 @@ if [ "$ENABLE_BOOT" = true ]; then
     cat <<EOF > "$DESKTOP_PATH"
 [Desktop Entry]
 Name=Image Slideshow
-Comment=Start the Image Slideshow
-Exec=$UV_BIN run --directory $PROJECT_DIR python main.py
+    Comment=Start the Image Slideshow
+Exec=$VENV_PYTHON $PROJECT_DIR/main.py
 Icon=utilities-terminal
 Terminal=false
 Type=Application
@@ -222,9 +222,15 @@ EOF
     echo "✅ Desktop shortcut created at $DESKTOP_PATH"
     
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "✅ Startup setup complete!"
     echo "The slideshow will start automatically on next boot."
 fi
+
+# 8. Set Ownership
+echo "🔐 Finalizing permissions for $CONFIG_DIR..."
+# Ensure the user who ran the setup owns the config directory and all files (including venv and db)
+sudo chown -R $USER:$USER "$CONFIG_DIR"
+echo "✅ Ownership set to $USER"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 echo "🎉 Setup Finished! Enjoy your slideshow."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
