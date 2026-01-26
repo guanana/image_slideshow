@@ -146,6 +146,10 @@ $UV_BIN sync
 # Note: We are using the dedicated venv for both tests and the service
 VENV_PYTHON="$CONFIG_DIR/venv/bin/python"
 echo "ℹ️  Application will use: $VENV_PYTHON"
+
+# 6. Initialize Database
+echo "🗄️ Initializing system database..."
+sudo "$VENV_PYTHON" -c "import sys; sys.path.append('$PROJECT_DIR'); from database import Database; Database()"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # 6. Verification Test
