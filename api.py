@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException, Body, Request
 from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
 from typing import Dict, Any
@@ -82,12 +82,15 @@ def restart_app():
     return {"status": "ok", "message": "Restarting application..."}
 
 @app.get("/current-image")
-def get_current_image():
+def get_current_image(request: Request):
     try:
-        if hasattr(app.state, 'slideshow') and app.state.slideshow.current_photo_path:
-            path = app.state.slideshow.current_photo_path
-            if os.path.exists(path):
+        slideshow = getattr(request.app.state, 'slideshow', None)
+        if slideshow and getattr(slideshow, 'current_photo_path', None):
+            path = slideshow.current_photo_path
+            if path and os.path.exists(path):
                 return FileResponse(path)
         raise HTTPException(status_code=404, detail="No image currently displayed")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

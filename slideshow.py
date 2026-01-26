@@ -16,6 +16,7 @@ class SlideshowApp:
         self._timer_id = None
         self._reload_timer_id = None
         self.is_first_run = True
+        self.current_photo_path = None
 
         # Initial Configuration Load
         self.reload_config()
