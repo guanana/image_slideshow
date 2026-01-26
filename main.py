@@ -9,35 +9,7 @@ from slideshow import SlideshowApp
 from database import Database
 from api import app as api_app
 
-def load_config():
-    config = configparser.ConfigParser()
-    
-    # Locations: prioritizing system config then CWD then user config then script directory
-    locations = [
-        '/etc/slideshow/config.ini',
-        os.path.join(os.getcwd(), 'config.ini'),
-        os.path.expanduser('~/.config/simple-image-slideshow/config.ini'),
-        os.path.join(os.path.dirname(__file__), 'config.ini')
-    ]
-    
-    config_file = None
-    for loc in locations:
-        if os.path.exists(loc):
-            config_file = loc
-            break
-            
-    if not config_file:
-        print("⚠️ Warning: config.ini not found! Using very basic defaults.", file=sys.stderr)
-        return {}
-        
-    print(f"📖 MATCHED CONFIG: {config_file}", file=sys.stderr)
-    config.read(config_file)
-    
-    if 'slideshow' in config:
-        return dict(config['slideshow'])
-    
-    print("⚠️ Warning: [slideshow] section not found in config.ini!")
-    return {}
+# load_config removed, now handled by Database class
 
 def start_api_server():
     try:
@@ -50,26 +22,7 @@ def main():
     # Initialize Database
     db = Database()
     
-    # Check if migration is needed (if DB is empty)
-    if db.is_empty():
-        print("ℹ️  Database empty. Migrating initial config...", file=sys.stderr)
-        config = load_config()
-        # Default defaults if even load_config returns nothing useful
-        defaults = {
-            'default_folder': '/etc/slideshow/images',
-            'default_interval': '5',
-            'background_color': 'black',
-            'enable_manual_controls': 'True',
-            'start_fullscreen': 'True',
-            'image_extensions': '.jpg,.jpeg,.png,.gif,.bmp,.webp'
-        }
-        
-        # Merge loaded config over defaults
-        final_config = defaults.copy()
-        final_config.update(config)
-        
-        for k, v in final_config.items():
-            db.set_setting(k, v)
+    # Database now handles its own sync/initialization
     
     # Start API in daemon thread
     api_thread = threading.Thread(target=start_api_server, daemon=True)

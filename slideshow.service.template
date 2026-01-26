@@ -1,0 +1,15 @@
+[Unit]
+Description=Image Slideshow Service
+After=graphical-session.target
+
+[Service]
+Type=simple
+Environment=DISPLAY=:0
+Environment=PYTHONUNBUFFERED=1
+WorkingDirectory={{WORKDIR}}
+ExecStart={{UV_BIN}} run python main.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target

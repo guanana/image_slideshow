@@ -187,25 +187,15 @@ if [ "$ENABLE_BOOT" = true ]; then
         fi
     fi
 
-    # Create service file dynamically
-    # User service inherits environment (DISPLAY, XAUTHORITY, etc.)
-    cat <<EOF > "$SERVICE_PATH"
-[Unit]
-Description=Image Slideshow Service
-After=graphical-session.target
-
-[Service]
-Type=simple
-Environment=DISPLAY=:0
-Environment=PYTHONUNBUFFERED=1
-WorkingDirectory=$PROJECT_DIR
-ExecStart=$UV_BIN run python main.py
-Restart=always
-RestartSec=3
-
-[Install]
-WantedBy=default.target
-EOF
+    # Create service file from template
+    if [ -f "$PROJECT_DIR/slideshow.service.template" ]; then
+        sed "s|{{WORKDIR}}|$PROJECT_DIR|g; s|{{UV_BIN}}|$UV_BIN|g" \
+            "$PROJECT_DIR/slideshow.service.template" > "$SERVICE_PATH"
+        echo "✅ Service file created from template at $SERVICE_PATH"
+    else
+        echo "❌ Error: slideshow.service.template not found!"
+        exit 1
+    fi
 
     echo "🔄 Enabling service..."
     systemctl --user daemon-reload
