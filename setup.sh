@@ -187,6 +187,14 @@ if [ "$ENABLE_BOOT" = true ]; then
         fi
     fi
 
+    # Explicitly ensure start_fullscreen is True in the system config for boot setup
+    if [ -f "$CONFIG_DIR/config.ini" ]; then
+        echo "📺 Ensuring fullscreen is enabled by default in system config..."
+        # If the key exists, update it. If not, we'd need more logic, but default config has it.
+        # This simple check handles both cases for most setups.
+        sudo sed -i 's/start_fullscreen = .*/start_fullscreen = True/' "$CONFIG_DIR/config.ini"
+    fi
+
     # Create service file from template
     if [ -f "$PROJECT_DIR/slideshow.service.template" ]; then
         sed "s|{{WORKDIR}}|$PROJECT_DIR|g; s|{{UV_BIN}}|$UV_BIN|g" \

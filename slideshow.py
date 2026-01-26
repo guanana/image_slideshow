@@ -85,6 +85,17 @@ class SlideshowApp:
             # Update bindings in case manual_enabled changed
             self.update_bindings()
             
+            # Dynamic Fullscreen Toggle
+            new_fullscreen = self.db.get_setting('start_fullscreen', 'True').lower() == 'true'
+            current_fullscreen = self.root.attributes("-fullscreen")
+            if new_fullscreen != bool(current_fullscreen):
+                print(f"📺 Fullscreen toggled: {current_fullscreen} -> {new_fullscreen}")
+                self.root.attributes("-fullscreen", new_fullscreen)
+                self.update_cursor()
+                self.root.focus_set()
+                # Trigger a resize/update
+                self.root.after(100, self.update_display)
+
             # Apply immediate visual changes
             self.root.configure(bg=self.bg_color)
             if hasattr(self, 'label'):
