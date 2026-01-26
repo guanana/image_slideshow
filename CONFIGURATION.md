@@ -35,11 +35,11 @@ enable_inky = False
 
 ### Configuration Parameters
 - **background_color**: Canvas color behind images (e.g. `black`, `#112233`).
-- **default_interval**: Time in seconds between image rotations.
+- **default_interval**: Time in seconds between image rotations. *Note: Must be at least 30s if Inky is enabled.*
 - **start_fullscreen**: Whether to launch in fullscreen mode (`True`/`False`).
 - **enable_manual_controls**: Enable arrow key navigation (`True`/`False`).
 - **image_extensions**: Comma-separated list of supported file types.
-- **enable_inky**: Enable support for Inky e-paper displays (`True`/`False`). Default is `False`.
+- **enable_inky**: Enable support for Inky e-paper displays (`True`/`False`). Default is `False`. *Note: Requires interval >= 30s.*
 
 ### 2. Updating via the API (On the fly)
 The application runs a FastAPI server (by default on port 8080) that allows you to change settings without restarting the app.
