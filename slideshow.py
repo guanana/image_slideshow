@@ -90,10 +90,6 @@ class SlideshowApp:
             if hasattr(self, 'label'):
                 self.label.config(bg=self.bg_color)
                 
-            # Check if folders changed (optional advanced feature, for now just image folder passed in args)
-            # If we wanted to support dynamic folder changing, we'd check 'default_folder' here too
-            # and call load_images() if it changed. Let's do it for completeness if folder matches default.
-            
             # For now, just re-scan images to pick up new files without restart
             self.load_images()
             
@@ -117,9 +113,6 @@ class SlideshowApp:
             self.root.unbind("<Left>")
 
     def load_images(self):
-        # Allow checking if image list changed to avoid flickering/resetting index
-        current_images_set = set(self.images)
-        
         ext_str = getattr(self, 'ext_str', '.jpg,.jpeg,.png,.gif,.bmp,.webp')
         valid_exts = {e.strip().lower() for e in ext_str.split(',')}
         try:
@@ -176,6 +169,7 @@ class SlideshowApp:
         self._timer_id = self.root.after(self.interval, self.auto_next)
 
     def auto_next(self):
+        if not self.images: return
         self.current_image_index += 1
         if self.current_image_index >= len(self.images):
             self.current_image_index = 0
@@ -200,7 +194,8 @@ class SlideshowApp:
         if not self.images: return
         
         try:
-            img = Image.open(self.images[self.current_image_index])
+            image_path = self.images[self.current_image_index]
+            img = Image.open(image_path)
             img = ImageOps.exif_transpose(img)
             
             self.root.update_idletasks()
@@ -215,35 +210,27 @@ class SlideshowApp:
             ratio = min(win_w/img_w, win_h/img_h)
             new_size = (int(img_w * ratio), int(img_h * ratio))
             
-            img = img.resize(new_size, Image.Resampling.LANCZOS)
-            self.photo_image = ImageTk.PhotoImage(img)
+            img_gui = img.resize(new_size, Image.Resampling.LANCZOS)
+            self.photo_image = ImageTk.PhotoImage(img_gui)
             self.label.config(image=self.photo_image)
-            self.current_photo_path = self.images[self.current_image_index]
+            self.current_photo_path = image_path
+
+            # UPDATE INKY SYNCHRONOUSLY (Blocks the app until done)
+            if self.ink_screen:
+                try:
+                    inky = auto(ask_user=False, verbose=False)
+                    # Use ImageOps.pad to fit image into inky.resolution without distortion
+                    # Centered on a white background
+                    resizedimage = ImageOps.pad(img, inky.resolution, color=(255, 255, 255))
+
+                    try:
+                        inky.set_image(resizedimage, saturation=0.5)
+                    except TypeError:
+                        inky.set_image(resizedimage)
+                    inky.show()
+                except Exception as e:
+                    print(f"⚠️ Inky update failed: {e}. Disabling Inky support for this cycle.")
+                    self.ink_screen = False
+
         except Exception as e:
             print(f"Error displaying image: {e}")
-            
-        if self.ink_screen:
-            # Start Inky update in a separate thread to keep UI responsive
-            threading.Thread(target=self._update_inky_background, daemon=True).start()
-
-    def _update_inky_background(self):
-        """Worker thread for Inky display updates."""
-        try:
-            image_path = self.images[self.current_image_index]
-            image = Image.open(image_path)
-            image = ImageOps.exif_transpose(image)
-            
-            inky = auto(ask_user=False, verbose=False)
-            
-            # Use ImageOps.pad to fit image into inky.resolution without distortion
-            # Centered on a white background
-            resizedimage = ImageOps.pad(image, inky.resolution, color=(255, 255, 255))
-
-            try:
-                inky.set_image(resizedimage, saturation=0.5)
-            except TypeError:
-                inky.set_image(resizedimage)
-            inky.show()
-        except Exception as e:
-            print(f"⚠️ Inky update failed: {e}. Disabling Inky support for this cycle.")
-            self.ink_screen = False
