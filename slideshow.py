@@ -221,7 +221,7 @@ class SlideshowApp:
             
             # Application Orientation
             if getattr(self, 'orientation', 'landscape') == 'portrait':
-                img = img.rotate(90, expand=True)
+                img = img.rotate(270, expand=True)
             
             self.root.update_idletasks()
             win_w = self.root.winfo_width()
