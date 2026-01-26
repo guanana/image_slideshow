@@ -231,8 +231,13 @@ class SlideshowApp:
         try:
             image_path = self.images[self.current_image_index]
             image = Image.open(image_path)
+            image = ImageOps.exif_transpose(image)
+            
             inky = auto(ask_user=False, verbose=False)
-            resizedimage = image.resize(inky.resolution)
+            
+            # Use ImageOps.pad to fit image into inky.resolution without distortion
+            # Centered on a white background
+            resizedimage = ImageOps.pad(image, inky.resolution, color=(255, 255, 255))
 
             try:
                 inky.set_image(resizedimage, saturation=0.5)
