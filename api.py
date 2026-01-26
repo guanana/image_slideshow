@@ -62,10 +62,21 @@ def restart_app():
     import signal
     import threading
     import time
+    import sys
 
-    def kill_soon():
+    # Standard restart via re-executing this process
+    def restart_soon():
         time.sleep(1) # Give time for response to send
-        os.kill(os.getpid(), signal.SIGTERM)
+        
+        # If we're using a full path to python (like in a venv), use that
+        python = sys.executable
+        # Get the path to the current script
+        script = sys.argv[0]
+        # Get the arguments passed to the script, filter out executable itself if present
+        args = sys.argv[1:]
+        
+        print("🔄 Restarting application...")
+        os.execv(python, [python, script] + args)
 
-    threading.Thread(target=kill_soon).start()
+    threading.Thread(target=restart_soon).start()
     return {"status": "ok", "message": "Restarting application..."}

@@ -12,6 +12,7 @@ class Database:
         self._init_db()
         self.load_defaults()
         self.sync_with_config()
+        self._validate_inky_constraint()
 
     def _init_db(self):
         # Ensure directory exists if possible, though strict permissions might block this
@@ -111,3 +112,13 @@ class Database:
         if self.is_empty():
             self.load_defaults()
         return False
+
+    def _validate_inky_constraint(self):
+        """Ensures default_interval is at least 30 if inky is enabled."""
+        all_settings = self.get_all_settings()
+        is_inky = all_settings.get('enable_inky', 'False').lower() == 'true'
+        interval = int(all_settings.get('default_interval', '30'))
+
+        if is_inky and interval < 30:
+            print(f"⚠️ Boot-time Fix: Inky enabled with {interval}s interval. Correcting to 30s.", file=sys.stderr)
+            self.set_setting('default_interval', '30')
