@@ -65,6 +65,9 @@ def main():
         db=db
     )
     
+    # Expose app instance to API for features like current image preview
+    api_app.state.slideshow = app
+    
     root.mainloop()
 
 if __name__ == "__main__":

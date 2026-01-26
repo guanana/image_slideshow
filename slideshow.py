@@ -82,6 +82,15 @@ class SlideshowApp:
             self.ext_str = self.db.get_setting('image_extensions', '.jpg,.jpeg,.png,.gif,.bmp,.webp')
             self.ink_screen = self.db.get_setting('enable_inky', 'False').lower() == 'true'
             
+            # Orientation Tracking
+            new_orientation = self.db.get_setting('orientation', 'landscape').lower()
+            if hasattr(self, 'orientation') and self.orientation != new_orientation:
+                print(f"🔄 Orientation changed: {self.orientation} -> {new_orientation}")
+                self.orientation = new_orientation
+                self.root.after(100, self.update_display)
+            else:
+                self.orientation = new_orientation
+
             # Update bindings in case manual_enabled changed
             self.update_bindings()
             
@@ -208,6 +217,10 @@ class SlideshowApp:
             image_path = self.images[self.current_image_index]
             img = Image.open(image_path)
             img = ImageOps.exif_transpose(img)
+            
+            # Application Orientation
+            if getattr(self, 'orientation', 'landscape') == 'portrait':
+                img = img.rotate(90, expand=True)
             
             self.root.update_idletasks()
             win_w = self.root.winfo_width()

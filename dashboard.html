@@ -251,6 +251,62 @@
             transform: translateY(0);
         }
 
+        .live-preview {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .preview-box {
+            width: 120px;
+            height: 80px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        .preview-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .preview-info h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .preview-info p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .card-input {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.4rem;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .card-input:focus {
+            border-color: var(--accent-color);
+        }
+
         .toggle-switch {
             position: relative;
             display: inline-block;
@@ -328,6 +384,16 @@
             </div>
         </header>
 
+        <div class="live-preview">
+            <div class="preview-box">
+                <img id="current-image" src="/current-image" alt="Slideshow Preview">
+            </div>
+            <div class="preview-info">
+                <h3>Live View</h3>
+                <p>Showing the image currently active on your display.</p>
+            </div>
+        </div>
+
         <div id="config-grid" class="grid">
             <div class="card">
                 <div class="card-label">Loading...</div>
@@ -403,12 +469,21 @@
             const isBool = value === 'True' || value === 'False';
             const isNumber = !isNaN(value) && !isNaN(parseFloat(value)) && key !== 'image_extensions';
 
-            const inputHtml = isBool
-                ? `<label class="toggle-switch">
+            let inputHtml;
+
+            if (key === 'orientation') {
+                inputHtml = `<select class="card-input" onchange="handleInputChange('${key}', this.value)">
+                    <option value="landscape" ${value === 'landscape' ? 'selected' : ''}>Landscape</option>
+                    <option value="portrait" ${value === 'portrait' ? 'selected' : ''}>Portrait</option>
+                </select>`;
+            } else if (isBool) {
+                inputHtml = `<label class="toggle-switch">
                      <input type="checkbox" ${value === 'True' ? 'checked' : ''} onchange="handleInputChange('${key}', this.checked ? 'True' : 'False')">
                      <span class="slider"></span>
-                   </label>`
-                : `<input type="${isNumber ? 'number' : 'text'}" value="${value}" oninput="handleInputChange('${key}', this.value)">`;
+                   </label>`;
+            } else {
+                inputHtml = `<input class="card-input" type="${isNumber ? 'number' : 'text'}" value="${value}" oninput="handleInputChange('${key}', this.value)">`;
+            }
 
             card.innerHTML = `
                 <div class="card-header">
@@ -421,6 +496,15 @@
             `;
             return card;
         }
+
+        // Periodically refresh the thumbnail
+        setInterval(() => {
+            const img = document.getElementById('current-image');
+            if (img) {
+                // Add timestamp to bypass cache
+                img.src = '/current-image?t=' + new Date().getTime();
+            }
+        }, 5000);
 
         let pendingChanges = {};
 
