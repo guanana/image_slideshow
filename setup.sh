@@ -222,9 +222,15 @@ EOF
     echo "✅ Desktop shortcut created at $DESKTOP_PATH"
     
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "✅ Startup setup complete!"
     echo "The slideshow will start automatically on next boot."
 fi
+
+# 8. Set Ownership
+echo "🔐 Finalizing permissions for $CONFIG_DIR..."
+# Ensure the user who ran the setup owns the config directory and all files (including venv and db)
+sudo chown -R $USER:$USER "$CONFIG_DIR"
+echo "✅ Ownership set to $USER"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 echo "🎉 Setup Finished! Enjoy your slideshow."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
