@@ -19,7 +19,9 @@ def dashboard():
 
 @app.get("/config")
 def get_config():
-    return db.get_all_settings()
+    all_settings = db.get_all_settings()
+    # Filter out provider-specific settings for the main dashboard display
+    return {k: v for k, v in all_settings.items() if not k.startswith("provider.")}
 
 @app.post("/config")
 def update_config(settings: Dict[str, Any] = Body(...)):
