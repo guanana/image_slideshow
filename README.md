@@ -55,6 +55,15 @@ The slideshow supports **external image source providers** — a modular plugin 
 
 Provider settings (including credentials) are stored in the local SQLite database.
 
+> ⚠️ **Immich API Key Permissions**
+>
+> If your Immich server uses granular permissions for API keys, ensure your key has the following enabled:
+> - `album.read`: To fetch the list of available albums.
+> - `asset.read`: To retrieve photo metadata.
+> - `asset.download`: To download the high-resolution photos.
+>
+> Alternatively, you can use a key with the `all` permission(better not!).
+
 ### Adding Custom Providers
 
 To add support for another image source (e.g., Google Photos, Dropbox), create a new provider class:
