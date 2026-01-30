@@ -23,7 +23,8 @@ dependencies = [
     "pillow>=10.0.0",
     "inky>=2.2.1",
     "numpy>=1.26.0",
-    "httpx>=0.23.0"
+    "httpx>=0.23.0",
+    "immich-lib>=0.1.0"
 ]
 
 [project.scripts]
@@ -31,3 +32,4 @@ slideshow-app = "main:main"
 
 [tool.setuptools]
 py-modules = ["api", "main", "slideshow", "database"]
+packages = ["providers"]

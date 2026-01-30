@@ -123,3 +123,78 @@ class Database:
         if is_inky and interval < 30:
             print(f"⚠️ Boot-time Fix: Inky enabled with {interval}s interval. Correcting to 30s.", file=sys.stderr)
             self.set_setting('default_interval', '30')
+
+    # ==================== Provider Settings ====================
+    
+    def get_provider_settings(self, provider_name: str) -> dict:
+        """
+        Get all settings for a specific provider.
+        
+        Args:
+            provider_name: The unique provider identifier (e.g., "immich")
+            
+        Returns:
+            Dictionary of provider-specific settings (without the prefix)
+        """
+        prefix = f"provider.{provider_name}."
+        all_settings = self.get_all_settings()
+        return {
+            key[len(prefix):]: value 
+            for key, value in all_settings.items() 
+            if key.startswith(prefix)
+        }
+    
+    def set_provider_setting(self, provider_name: str, key: str, value) -> None:
+        """
+        Set a provider-specific setting.
+        
+        Args:
+            provider_name: The unique provider identifier
+            key: The setting key (without provider prefix)
+            value: The setting value
+        """
+        full_key = f"provider.{provider_name}.{key}"
+        self.set_setting(full_key, value)
+    
+    def set_provider_settings(self, provider_name: str, settings: dict) -> None:
+        """
+        Set multiple provider settings at once.
+        
+        Args:
+            provider_name: The unique provider identifier
+            settings: Dictionary of key-value pairs to set
+        """
+        for key, value in settings.items():
+            self.set_provider_setting(provider_name, key, value)
+    
+    def get_provider_last_sync(self, provider_name: str) -> dict:
+        """
+        Get the last sync result for a provider.
+        
+        Args:
+            provider_name: The unique provider identifier
+            
+        Returns:
+            Dictionary with last sync info or empty dict if never synced
+        """
+        import json
+        result_json = self.get_setting(f"provider.{provider_name}._last_sync")
+        if result_json:
+            try:
+                return json.loads(result_json)
+            except json.JSONDecodeError:
+                return {}
+        return {}
+    
+    def set_provider_last_sync(self, provider_name: str, result: dict) -> None:
+        """
+        Store the last sync result for a provider.
+        
+        Args:
+            provider_name: The unique provider identifier
+            result: Dictionary with sync result data
+        """
+        import json
+        from datetime import datetime
+        result["timestamp"] = datetime.utcnow().isoformat() + "Z"
+        self.set_setting(f"provider.{provider_name}._last_sync", json.dumps(result))
