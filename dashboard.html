@@ -371,6 +371,270 @@
             display: inline-block;
             animation: pulse 1.5s infinite;
         }
+
+        /* Provider Cards */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title svg {
+            color: var(--accent-color);
+        }
+
+        .provider-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .provider-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .provider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .provider-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .provider-status {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+        }
+
+        .provider-status.configured {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .provider-status.not-configured {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .provider-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .provider-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .provider-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.813rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .provider-btn.configure {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .provider-btn.configure:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .provider-btn.test {
+            background: rgba(129, 140, 248, 0.1);
+            color: #818cf8;
+            border: 1px solid rgba(129, 140, 248, 0.3);
+        }
+
+        .provider-btn.test:hover {
+            background: #818cf8;
+            color: white;
+        }
+
+        .provider-btn.refresh {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            border: none;
+        }
+
+        .provider-btn.refresh:hover {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .provider-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .provider-last-sync {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 2rem;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.25rem;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-label .required {
+            color: var(--danger);
+        }
+
+        .form-description {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.35rem;
+            opacity: 0.8;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            font-size: 0.938rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-color);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .album-selector {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .album-selector select {
+            flex: 1;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-cancel {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-save:hover {
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
     </style>
 </head>
 
@@ -402,6 +666,21 @@
             </div>
         </div>
 
+        <!-- Image Sources Section -->
+        <h2 class="section-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Image Sources
+        </h2>
+        <div id="providers-container">
+            <div class="provider-card">
+                <div class="provider-description loading">Loading providers...</div>
+            </div>
+        </div>
+
         <div class="controls">
             <button class="btn-main" onclick="fetchConfig()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -425,6 +704,23 @@
     </div>
 
     <div id="toast" class="toast">Action completed!</div>
+
+    <!-- Provider Config Modal -->
+    <div id="provider-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Configure Provider</h3>
+                <button class="modal-close" onclick="closeProviderModal()">&times;</button>
+            </div>
+            <form id="provider-config-form">
+                <div id="modal-fields"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeProviderModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Configuration</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         let originalConfig = {};
@@ -564,7 +860,284 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        document.addEventListener('DOMContentLoaded', fetchConfig);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchConfig();
+            fetchProviders();
+        });
+
+        // ==================== Provider Functions ====================
+
+        let currentProviderName = null;
+
+        async function fetchProviders() {
+            const container = document.getElementById('providers-container');
+            try {
+                const res = await fetch('/providers');
+                const data = await res.json();
+                container.innerHTML = '';
+
+                if (!data.providers || data.providers.length === 0) {
+                    container.innerHTML = '<div class="provider-card"><div class="provider-description">No image source providers available.</div></div>';
+                    return;
+                }
+
+                data.providers.forEach(provider => {
+                    container.appendChild(createProviderCard(provider));
+                });
+            } catch (e) {
+                container.innerHTML = '<div class="provider-card"><div class="provider-description">Failed to load providers.</div></div>';
+            }
+        }
+
+        function createProviderCard(provider) {
+            const card = document.createElement('div');
+            card.className = 'provider-card';
+            card.id = `provider-${provider.name}`;
+
+            const statusClass = provider.configured ? 'configured' : 'not-configured';
+            const statusText = provider.configured ? 'Configured' : 'Not Configured';
+            const refreshDisabled = provider.configured ? '' : 'disabled';
+
+            let lastSyncHtml = '';
+            if (provider.last_sync && provider.last_sync.timestamp) {
+                const date = new Date(provider.last_sync.timestamp);
+                const status = provider.last_sync.status || 'unknown';
+                const msg = provider.last_sync.message || '';
+                lastSyncHtml = `
+                    <div class="provider-last-sync">
+                        Last sync: ${date.toLocaleString()} — <strong>${status}</strong>: ${msg}
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="provider-header">
+                    <span class="provider-name">${provider.display_name}</span>
+                    <span class="provider-status ${statusClass}">${statusText}</span>
+                </div>
+                <div class="provider-description">${provider.description}</div>
+                <div class="provider-actions">
+                    <button class="provider-btn configure" onclick="openProviderConfig('${provider.name}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                        Configure
+                    </button>
+                    <button class="provider-btn test" onclick="testProvider('${provider.name}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        Test
+                    </button>
+                    <button class="provider-btn refresh" onclick="refreshProvider('${provider.name}')" ${refreshDisabled}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Refresh Images
+                    </button>
+                </div>
+                ${lastSyncHtml}
+            `;
+            return card;
+        }
+
+        async function openProviderConfig(providerName) {
+            currentProviderName = providerName;
+            const modal = document.getElementById('provider-modal');
+            const title = document.getElementById('modal-title');
+            const fieldsContainer = document.getElementById('modal-fields');
+
+            try {
+                const res = await fetch(`/providers/${providerName}/config`);
+                const data = await res.json();
+
+                title.textContent = `Configure ${providerName.charAt(0).toUpperCase() + providerName.slice(1)}`;
+                fieldsContainer.innerHTML = '';
+
+                // Store schema for reference
+                window.currentProviderSchema = data.schema;
+
+                data.schema.forEach(field => {
+                    const value = data.values[field.key] || field.default || '';
+                    const required = field.required ? '<span class="required">*</span>' : '';
+                    const inputType = field.type === 'password' ? 'password' : 'text';
+
+                    let inputHtml;
+                    if (field.type === 'boolean') {
+                        const checked = String(value).toLowerCase() === 'true' ? 'checked' : '';
+                        inputHtml = `
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="${field.key}" ${checked}>
+                                <span class="slider"></span>
+                            </label>
+                        `;
+                    } else if (field.key === 'album_name' && providerName === 'immich') {
+                        // Special handling for album_name - will be a dropdown
+                        inputHtml = `
+                            <div class="album-selector">
+                                <select name="${field.key}" id="album-select" class="form-input" style="flex:1">
+                                    <option value="">-- Click "Fetch Albums" first --</option>
+                                    ${value ? `<option value="${value}" selected>${value}</option>` : ''}
+                                </select>
+                                <button type="button" class="provider-btn configure" onclick="fetchAlbums()" style="margin-left: 0.5rem; white-space: nowrap;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                        <polyline points="7 10 12 15 17 10"/>
+                                        <line x1="12" y1="15" x2="12" y2="3"/>
+                                    </svg>
+                                    Fetch Albums
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        inputHtml = `<input type="${inputType}" name="${field.key}" class="form-input" value="${value}" ${field.required ? 'required' : ''}>`;
+                    }
+
+                    fieldsContainer.innerHTML += `
+                        <div class="form-group">
+                            <label class="form-label">${field.label} ${required}</label>
+                            ${inputHtml}
+                            ${field.description ? `<div class="form-description">${field.description}</div>` : ''}
+                        </div>
+                    `;
+                });
+
+                modal.classList.add('show');
+            } catch (e) {
+                showToast('Failed to load provider configuration', true);
+            }
+        }
+
+        async function fetchAlbums() {
+            const serverUrlInput = document.querySelector('input[name="server_url"]');
+            const apiKeyInput = document.querySelector('input[name="api_key"]');
+            const albumSelect = document.getElementById('album-select');
+
+            if (!serverUrlInput || !apiKeyInput) {
+                showToast('Please enter Server URL and API Key first', true);
+                return;
+            }
+
+            const serverUrl = serverUrlInput.value.trim();
+            const apiKey = apiKeyInput.value.trim();
+
+            if (!serverUrl || !apiKey) {
+                showToast('Server URL and API Key are required', true);
+                return;
+            }
+
+            albumSelect.innerHTML = '<option value="">Loading albums...</option>';
+            albumSelect.disabled = true;
+
+            try {
+                const res = await fetch(`/providers/${currentProviderName}/albums`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ server_url: serverUrl, api_key: apiKey })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showToast(data.detail || 'Failed to fetch albums', true);
+                    albumSelect.innerHTML = '<option value="">Failed to load albums</option>';
+                    albumSelect.disabled = false;
+                    return;
+                }
+
+                albumSelect.innerHTML = '';
+                data.albums.forEach(album => {
+                    const countText = album.count > 0 ? ` (${album.count} photos)` : '';
+                    const option = document.createElement('option');
+                    option.value = album.name === '(All Assets)' ? '' : album.name;
+                    option.textContent = album.name + countText;
+                    albumSelect.appendChild(option);
+                });
+
+                albumSelect.disabled = false;
+                showToast(`Found ${data.albums.length - 1} albums`);
+            } catch (e) {
+                showToast('Failed to fetch albums', true);
+                albumSelect.innerHTML = '<option value="">Error loading albums</option>';
+                albumSelect.disabled = false;
+            }
+        }
+
+        function closeProviderModal() {
+            document.getElementById('provider-modal').classList.remove('show');
+            currentProviderName = null;
+        }
+
+        document.getElementById('provider-config-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentProviderName) return;
+
+            const formData = new FormData(e.target);
+            const settings = {};
+
+            // Handle checkboxes specially
+            e.target.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                settings[cb.name] = cb.checked ? 'True' : 'False';
+            });
+
+            // Handle other inputs
+            for (const [key, value] of formData.entries()) {
+                if (!settings.hasOwnProperty(key)) {
+                    settings[key] = value;
+                }
+            }
+
+            try {
+                const res = await fetch(`/providers/${currentProviderName}/config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+
+                if (res.ok) {
+                    showToast('Configuration saved successfully');
+                    closeProviderModal();
+                    fetchProviders();
+                } else {
+                    const data = await res.json();
+                    showToast(data.detail || 'Failed to save configuration', true);
+                }
+            } catch (e) {
+                showToast('API Error', true);
+            }
+        });
+
+        async function testProvider(providerName) {
+            showToast('Testing connection...');
+            try {
+                const res = await fetch(`/providers/${providerName}/test`, { method: 'POST' });
+                const data = await res.json();
+                showToast(data.message, !data.success);
+            } catch (e) {
+                showToast('Test failed', true);
+            }
+        }
+
+        async function refreshProvider(providerName) {
+            showToast('Refreshing images... This may take a while.');
+            try {
+                const res = await fetch(`/providers/${providerName}/refresh`, { method: 'POST' });
+                const data = await res.json();
+
+                if (data.result) {
+                    showToast(data.result.message, data.status === 'error');
+                } else {
+                    showToast('Refresh completed');
+                }
+                fetchProviders();
+            } catch (e) {
+                showToast('Refresh failed', true);
+            }
+        }
     </script>
 </body>
 
